@@ -44,3 +44,11 @@ VALUES
 ('76','VALLE DEL CAUCA'),
 ('97','VAUPES'),
 ('99','VICHADA');
+
+INSERT INTO municipio (codigoMunicipio,nombreMunicipio,fk_codigoDepartamento)
+VALUES
+('73001','IBAGUE','73'),
+('41001','NEIVA','41'),
+('25307','GIRARDOT','25'),
+('63001','ARMENIA','63'),
+('17001','MANIZALES','17');
