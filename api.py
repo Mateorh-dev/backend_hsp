@@ -48,7 +48,7 @@ async def consultar_datos_general(nombretabla:str,pagina:int=1):
         raise HTTPException(status_code=500, detail="Tabla no encontrado")
 
 # paciente
-@app.get("/select/paciente", tags=["Pacientes"])
+@app.get("/select/paciente", tags=["Paciente"])
 async def consultar_id_paciente(numeroIdentificacion:str):
     ni = numeroIdentificacion
     sql = com_sql.consulta_por_identificador("paciente","numeroIdentificacion")
@@ -63,7 +63,7 @@ async def consultar_id_paciente(numeroIdentificacion:str):
         return rows
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.post("/insert/paciente", tags=["Pacientes"])
+@app.post("/insert/paciente", tags=["Paciente"])
 async def registrar_paciente(numeroIdentificacion:str,primerNombre:str,segundoNombre:str,primerApellido:str,segundoApellido:str,fechaNacimiento:str,peso:str,telefono:str,direccion:str,correoElectronico:str,Profesion:str,antecedentes:str,alergias:str,fk_codigoMunicipio:str):
     columnas = ("numeroIdentificacion","primerNombre","segundoNombre","primerApellido","segundoApellido","fechaNacimiento","peso","telefono","direccion","correoElectronico","Profesion","antecedentes","alergias","fk_codigoMunicipio")
     sql = com_sql.insertar_datos("paciente",columnas)
@@ -73,13 +73,13 @@ async def registrar_paciente(numeroIdentificacion:str,primerNombre:str,segundoNo
         return {"mensaje":f"Se registro el paciente {numeroIdentificacion},{primerNombre},{primerApellido},{telefono},{correoElectronico} correctamente"}
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.put("/update/paciente", tags=["Pacientes"])
+@app.put("/update/paciente", tags=["Paciente"])
 async def actualizar_paciente(numeroIdentificacion:str,primerNombre:str="",segundoNombre:str="",primerApellido:str="",segundoApellido:str="",fechaNacimiento:str="",peso:str="",telefono:str="",direccion:str="",correoElectronico:str="",Profesion:str="",antecedentes:str="",alergias:str="",fk_codigoMunicipio:str=""):
     ni = ("numeroIdentificacion",numeroIdentificacion)
-    atributos = {"primerNombre":primerNombre,
-                 "segundoNombre":segundoNombre,
-                 "primerApellido":primerApellido,
-                 "segundoApellido":segundoApellido,
+    atributos = {"primerNombre":primerNombre.upper(),
+                 "segundoNombre":segundoNombre.upper(),
+                 "primerApellido":primerApellido.upper(),
+                 "segundoApellido":segundoApellido.upper(),
                  "fechaNacimiento":fechaNacimiento,
                  "peso":peso,
                  "telefono":telefono,
@@ -102,7 +102,7 @@ async def actualizar_paciente(numeroIdentificacion:str,primerNombre:str="",segun
         return {"mensaje" : f"Se actualizo el paciente identificado {rows[0]["numeroIdentificacion"]}"}
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.delete("/delete/paciente", tags=["Pacientes"])
+@app.delete("/delete/paciente", tags=["Paciente"])
 async def eliminar_paciente(numeroIdentificacion:str):
     ni = numeroIdentificacion
     sql_consultar = com_sql.consulta_por_identificador("paciente","numeroIdentificacion")
