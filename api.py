@@ -48,7 +48,7 @@ async def consultar_datos_general(nombretabla:str,pagina:int=1):
         raise HTTPException(status_code=500, detail="Tabla no encontrado")
 
 # paciente
-@app.get("/select/paciente")
+@app.get("/select/paciente", tags=["Pacientes"])
 async def consultar_id_paciente(numeroIdentificacion:str):
     ni = numeroIdentificacion
     sql = com_sql.consulta_por_identificador("paciente","numeroIdentificacion")
@@ -63,7 +63,7 @@ async def consultar_id_paciente(numeroIdentificacion:str):
         return rows
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.post("/insert/paciente")
+@app.post("/insert/paciente", tags=["Pacientes"])
 async def registrar_paciente(numeroIdentificacion:str,primerNombre:str,segundoNombre:str,primerApellido:str,segundoApellido:str,fechaNacimiento:str,peso:str,telefono:str,direccion:str,correoElectronico:str,Profesion:str,antecedentes:str,alergias:str,fk_codigoMunicipio:str):
     columnas = ("numeroIdentificacion","primerNombre","segundoNombre","primerApellido","segundoApellido","fechaNacimiento","peso","telefono","direccion","correoElectronico","Profesion","antecedentes","alergias","fk_codigoMunicipio")
     sql = com_sql.insertar_datos("paciente",columnas)
@@ -73,7 +73,7 @@ async def registrar_paciente(numeroIdentificacion:str,primerNombre:str,segundoNo
         return {"mensaje":f"Se registro el paciente {numeroIdentificacion},{primerNombre},{primerApellido},{telefono},{correoElectronico} correctamente"}
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.put("/update/paciente")
+@app.put("/update/paciente", tags=["Pacientes"])
 async def actualizar_paciente(numeroIdentificacion:str,primerNombre:str="",segundoNombre:str="",primerApellido:str="",segundoApellido:str="",fechaNacimiento:str="",peso:str="",telefono:str="",direccion:str="",correoElectronico:str="",Profesion:str="",antecedentes:str="",alergias:str="",fk_codigoMunicipio:str=""):
     ni = ("numeroIdentificacion",numeroIdentificacion)
     atributos = {"primerNombre":primerNombre,
@@ -102,7 +102,7 @@ async def actualizar_paciente(numeroIdentificacion:str,primerNombre:str="",segun
         return {"mensaje" : f"Se actualizo el paciente identificado {rows[0]["numeroIdentificacion"]}"}
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.delete("/delete/paciente")
+@app.delete("/delete/paciente", tags=["Pacientes"])
 async def eliminar_paciente(numeroIdentificacion:str):
     ni = numeroIdentificacion
     sql_consultar = com_sql.consulta_por_identificador("paciente","numeroIdentificacion")
@@ -121,7 +121,7 @@ async def eliminar_paciente(numeroIdentificacion:str):
         raise HTTPException(status_code=500, detail=f"Error {e}")
 
 # cita
-@app.get("/select/cita")
+@app.get("/select/cita", tags=["Cita"])
 async def consultar_id_cita(codigoCita:str):
     ct = codigoCita
     sql = com_sql.consulta_por_identificador("cita","codigoCita")
@@ -135,7 +135,7 @@ async def consultar_id_cita(codigoCita:str):
         return rows
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.post("/insert/cita")
+@app.post("/insert/cita", tags=["Cita"])
 async def registrar_cita(codigoCita:str,fecha:str,hora:str,patologias:str,tratamientoRecomendado:str,precio:int,observacion:str,fk_codigoEstado:str):
     columnas = ("codigoCita","fecha","hora","patologias","tratamientoRecomendado","precio","observacion","fk_codigoEstado")
     sql = com_sql.insertar_datos("cita",columnas)
@@ -145,7 +145,7 @@ async def registrar_cita(codigoCita:str,fecha:str,hora:str,patologias:str,tratam
         return {"mensaje":f"Se registro el cita {codigoCita},{fecha},{hora},{patologias},{tratamientoRecomendado},{precio},{observacion},{fk_codigoEstado} correctamente"}
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.put("/update/cita")
+@app.put("/update/cita", tags=["Cita"])
 async def actualizar_cita(codigoCita:str,fecha:str="",hora:str="",patologias:str="",tratamientoRecomendado:str="",precio:int=0,observacion:str="",fk_codigoEstado:str=""):
     ct = ("codigoCita",codigoCita)
     atributos = {"fecha":fecha,
@@ -168,7 +168,7 @@ async def actualizar_cita(codigoCita:str,fecha:str="",hora:str="",patologias:str
         return {"mensaje" : f"Se actualizo la cita identificada {rows[0]["codigoCita"]}"}
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.delete("/delete/cita")
+@app.delete("/delete/cita", tags=["Cita"])
 async def eliminar_cita(codigoCita:str):
     ct = codigoCita
     sql_consultar = com_sql.consulta_por_identificador("cita","codigoCita")
@@ -187,7 +187,7 @@ async def eliminar_cita(codigoCita:str):
         raise HTTPException(status_code=500, detail=f"Error {e}")
 
 # tratamiento
-@app.get("/select/tratamiento")
+@app.get("/select/tratamiento", tags=["Tratamiento"])
 async def consultar_id_tratamiento(codigoTratamiento:str):
     ct = codigoTratamiento
     sql = com_sql.consulta_por_identificador("tratamiento","codigoTratamiento")
@@ -201,7 +201,7 @@ async def consultar_id_tratamiento(codigoTratamiento:str):
         return rows
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.post("/insert/tratamiento")
+@app.post("/insert/tratamiento", tags=["Tratamiento"])
 async def registrar_tratamiento(codigoTratamiento:str,nombreTratamiento:str,fk_numeroIdentificacion:str):
     columnas = ("codigoTratamiento","nombreTratamiento","fk_numeroIdentificacion")
     sql = com_sql.insertar_datos("tratamiento",columnas)
@@ -211,7 +211,7 @@ async def registrar_tratamiento(codigoTratamiento:str,nombreTratamiento:str,fk_n
         return {"mensaje":f"Se registro el tratamiento {codigoTratamiento},{nombreTratamiento},{fk_numeroIdentificacion} correctamente"}
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.put("/update/tratamiento")
+@app.put("/update/tratamiento", tags=["Tratamiento"])
 async def actualizar_tratamiento(codigoTratamiento:str,nombreTratamiento:str="",fk_numeroIdentificacion:str=""):
     ct = ("codigoTratamiento", codigoTratamiento)
     atributos = {"nombreTratamiento":nombreTratamiento,
@@ -229,7 +229,7 @@ async def actualizar_tratamiento(codigoTratamiento:str,nombreTratamiento:str="",
         return {"mensaje" : f"Se actualizo el tratamiento {rows[0]["nombreTratamiento"]}"}
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.delete("/delete/tratamiento")
+@app.delete("/delete/tratamiento", tags=["Tratamiento"])
 async def eliminar_tratamiento(codigoTratamiento:str):
     ct = codigoTratamiento
     sql_consultar = com_sql.consulta_por_identificador("tratamiento","codigoTratamiento")
@@ -248,7 +248,7 @@ async def eliminar_tratamiento(codigoTratamiento:str):
         raise HTTPException(status_code=500, detail=f"Error {e}")
 
 # municipio
-@app.get("/select/municipio")
+@app.get("/select/municipio", tags=["Municipio"])
 async def consultar_id_municipio(codigoMunicipio:str):
     cm = codigoMunicipio
     sql = com_sql.consulta_por_identificador("municipio","codigoMunicipio")
@@ -262,7 +262,7 @@ async def consultar_id_municipio(codigoMunicipio:str):
         return rows
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.post("/insert/municipio")
+@app.post("/insert/municipio", tags=["Municipio"])
 async def registrar_municipio(codigoMunicipio:str,nombreMunicipio:str,fk_codigoDepartamento:str):
     columnas = ("codigoMunicipio","nombreMunicipio","fk_codigoDepartamento")
     sql = com_sql.insertar_datos("municipio",columnas)
@@ -272,7 +272,7 @@ async def registrar_municipio(codigoMunicipio:str,nombreMunicipio:str,fk_codigoD
         return {"mensaje":f"Se registro el municipio {codigoMunicipio},{nombreMunicipio},{fk_codigoDepartamento} correctamente"}
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.put("/update/municipio")
+@app.put("/update/municipio", tags=["Municipio"])
 async def actualizar_municipio(codigoMunicipio:str,nombreMunicipio:str="",fk_codigoDepartamento:str=""):
     cm = ("codigoMunicipio",codigoMunicipio)
     atributos = {"nombreMunicipio":nombreMunicipio,
@@ -290,7 +290,7 @@ async def actualizar_municipio(codigoMunicipio:str,nombreMunicipio:str="",fk_cod
         return {"mensaje" : f"Se actualizo el municipio {rows[0]["nombreMunicipio"]}"}
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.delete("/delete/municipio")
+@app.delete("/delete/municipio", tags=["Municipio"])
 async def eliminar_municipio(codigoMunicipio:str):
     cm = codigoMunicipio
     sql_consultar = com_sql.consulta_por_identificador("municipio","codigoMunicipio")
@@ -309,7 +309,7 @@ async def eliminar_municipio(codigoMunicipio:str):
         raise HTTPException(status_code=500, detail=f"Error {e}")
 
 # departamento
-@app.get("/select/departamento")
+@app.get("/select/departamento", tags=["Departamento"])
 async def consultar_id_departamento(codigoDepartamento:str):
     cd = codigoDepartamento
     sql = com_sql.consulta_por_identificador("departamento","codigoDepartamento")
@@ -323,7 +323,7 @@ async def consultar_id_departamento(codigoDepartamento:str):
         return rows
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.post("/insert/departamento")
+@app.post("/insert/departamento", tags=["Departamento"])
 async def registrar_departamento(codigoDepartamento:str,nombreDepartamento:str):
     columnas = ("codigoDepartamento","nombreDepartamento")
     sql = com_sql.insertar_datos("departamento",columnas)
@@ -333,7 +333,7 @@ async def registrar_departamento(codigoDepartamento:str,nombreDepartamento:str):
         return {"mensaje" : f"Se registro el departamento {codigoDepartamento}, {nombreDepartamento} correctamnte"}
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.put("/update/departamento")
+@app.put("/update/departamento", tags=["Departamento"])
 async def actualizar_departamento(codigoDepartamento:str,nombreDepartamento:str=""):
     cd = ("codigoDepartamento",codigoDepartamento)
     atributos = {"nombreDepartamento":nombreDepartamento}
@@ -349,7 +349,7 @@ async def actualizar_departamento(codigoDepartamento:str,nombreDepartamento:str=
         return {"mensaje" : f"Se actualizo el departamento {rows[0]["nombreDepartamento"]}"}
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.delete("/delete/departamento")
+@app.delete("/delete/departamento", tags=["Departamento"])
 async def eliminar_departamento(codigoDepartamento:str=""):
     cd = codigoDepartamento
     sql_consultar = com_sql.consulta_por_identificador("departamento","codigoDepartamento")
@@ -368,7 +368,7 @@ async def eliminar_departamento(codigoDepartamento:str=""):
         raise HTTPException(status_code=500, detail=f"Error {e}")
 
 # estado
-@app.get("/select/estado")
+@app.get("/select/estado", tags=["Estado"])
 async def consultar_id_estado(codigoEstado:str):
     ce = codigoEstado
     sql = com_sql.consulta_por_identificador("estado","codigoEstado")
@@ -382,7 +382,7 @@ async def consultar_id_estado(codigoEstado:str):
         return rows
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.post("/insert/estado")
+@app.post("/insert/estado", tags=["Estado"])
 async def registrar_estado(codigoEstado:str,nombreEstado:str):
     columnas = ("codigoEstado","nombreEstado")
     sql = com_sql.insertar_datos("estado",columnas)
@@ -392,7 +392,7 @@ async def registrar_estado(codigoEstado:str,nombreEstado:str):
         return {"mensaje":f"Se registro el estado {codigoEstado},{nombreEstado} correctamente"}
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.put("/update/estado")
+@app.put("/update/estado", tags=["Estado"])
 async def actualizar_estado(codigoEstado:str,nombreEstado:str=""):
     ce = ("codigoEstado",codigoEstado)
     atributos = {"nombreEstado":nombreEstado}
@@ -408,7 +408,7 @@ async def actualizar_estado(codigoEstado:str,nombreEstado:str=""):
         return {"mensaje" : f"Se actualizo el esado {rows[0]["nombreEstado"]}"}
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.delete("/delete/estado")
+@app.delete("/delete/estado", tags=["Estado"])
 async def eliminar_estado(codigoEstado:str):
     ce = codigoEstado
     sql_consultar = com_sql.consulta_por_identificador("estado","codigoEstado")
@@ -427,7 +427,7 @@ async def eliminar_estado(codigoEstado:str):
         raise HTTPException(status_code=500, detail=f"Error {e}")
 
 # imagen
-@app.get("/select/imagen")
+@app.get("/select/imagen", tags=["Imagen"])
 async def consultar_id_imagen(refImagen:str):
     ri = refImagen
     sql = com_sql.consulta_por_identificador("imagen","refImagen")
@@ -441,7 +441,7 @@ async def consultar_id_imagen(refImagen:str):
         return rows
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.post("/insert/imagen")
+@app.post("/insert/imagen", tags=["Imagen"])
 async def registrar_imagen(refImagen:str,fk_codigoCita:str):
     columnas = ("refImagen","fk_codigoCita")
     sql = com_sql.insertar_datos("imagen",columnas)
@@ -451,7 +451,7 @@ async def registrar_imagen(refImagen:str,fk_codigoCita:str):
         return {"mensaje":f"Se registro la imagen {refImagen},{fk_codigoCita} correctamente"}
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.put("/update/imagen")
+@app.put("/update/imagen", tags=["Imagen"])
 async def actualizar_imagen(refImagen:str,fk_codigoCita:str=""):
     ri = ("refImagen", refImagen)
     atributos = {"fk_codigoCita":fk_codigoCita}
@@ -467,7 +467,7 @@ async def actualizar_imagen(refImagen:str,fk_codigoCita:str=""):
         return {"mensaje" : f"Se actualizo la imagen identidicada {rows[0]["refImagen"]}"}
     except mariadb.Error as e:
         raise HTTPException(status_code=500, detail=f"Error {e}")
-@app.delete("/delete/imagen")
+@app.delete("/delete/imagen", tags=["Imagen"])
 async def eliminar_imagen(refImagen:str):
     ri = refImagen
     sql_consultar = com_sql.consulta_por_identificador("imagen","refImagen")
