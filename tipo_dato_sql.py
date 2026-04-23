@@ -68,3 +68,12 @@ class Time:
         pass
     def __str__(self):
         return f"TIME"
+
+class Bool:
+    """
+    TINYINT(1)
+    """
+    def __init__(self):
+        pass
+    def __str__(self):
+        return f"TINYINT(1)"
