@@ -5,7 +5,7 @@ recorrer cada tabla
     contruir la linea
     comprobar si es fk
       NOTA:fk no se deben espefican valores, toma los de su referencia, omitiendo si es PK o AUTO
-      Cada fk solo se creara si exite la tabla, en caso contrario debera de guardarse en una lisa para crearse al final
+      Cada fk solo se creara si exite la tabla, en caso contrario debera de guardarse en una lista para crearse al final
       En caso de no poderse crear, se enlista para mensaje de advertencia
 """
 
