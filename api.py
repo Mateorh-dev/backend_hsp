@@ -1,6 +1,6 @@
 import mariadb
 from fastapi import FastAPI, HTTPException
-import datos_pefil_db as dp
+import datos_perfil_db as dp
 import comandos_sql as com_sql
 from objeto_crud import SistemaCRUD
 
