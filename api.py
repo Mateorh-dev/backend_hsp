@@ -2,6 +2,7 @@ import mariadb
 from fastapi import FastAPI, HTTPException
 import datos_pefil_db as dp
 import comandos_sql as com_sql
+from objeto_crud import SistemaCRUD
 
 DB_HOST = dp.HOST
 DB_NAME = dp.NAME
@@ -23,16 +24,24 @@ except mariadb.Error as e:
 cursor_obj = cc.cursor(dictionary=True)
 app = FastAPI()
 
-#Definición de rutas  
-# @app.get("/")  
-# async def root(): 
-#     return {"mensaje": "Hola desde FastAPI con MariaDB"}
+protocolos = {
+    "HTTPException":HTTPException,
+    "cursor_obj":cursor_obj,
+    "mariadb":mariadb,
+    "cc":cc,
+}
 
-# c @app.post("/insert")
-# r @app.get("/select")
-# u @app.put("/update")
-# d @app.delete("/delete")
+"""
+Definición de rutas  
+@app.get("/")  
+async def root(): 
+    return {"mensaje": "Hola desde FastAPI con MariaDB"}
 
+c @app.post("/insert")
+r @app.get("/select")
+u @app.put("/update")
+d @app.delete("/delete")
+"""
 @app.get("/selectall/{nombretabla}")
 async def consultar_datos_general(nombretabla:str,pagina:int=1):
     sql = com_sql.consulta_paginada(nombretabla,pagina)
@@ -45,462 +54,344 @@ async def consultar_datos_general(nombretabla:str,pagina:int=1):
             raise HTTPException(status_code=400, detail="No se encontraron datos")
         return rows
     except mariadb.Error:
-        raise HTTPException(status_code=500, detail="Tabla no encontrado")
+        raise HTTPException(status_code=500, detail="Tabla no encontrada")
+
+# SISTEMA
 
 # paciente
+t_paciente = SistemaCRUD(
+    tabla="paciente",
+    identificador= {"numeroIdentificacion":[15,"rango"]},
+    primerNombre=None,
+    segundoNombre=None,
+    primerApellido=None,
+    segundoApellido=None,
+    fechaNacimiento=None,
+    peso=None,
+    telefono=None,
+    correoElectronico=None,
+    direccion=None,
+    profesion=None,
+    antecedentes=None,
+    alergias=None,
+    fk_codigoMunicipio=None,
+    )
 @app.get("/select/paciente", tags=["Paciente"])
 async def consultar_id_paciente(numeroIdentificacion:str):
-    ni = numeroIdentificacion
-    sql = com_sql.consulta_por_identificador("paciente","numeroIdentificacion")
-        # SELECT * FROM paciente WHERE numeroIdentificacion='?';
-    if len(ni) < 1 or len(ni) > 15:
-        raise HTTPException(status_code=400, detail="Numero de identificacion no valido, debe estar entre el rango de 1 a 15 caracteres")
-    try:
-        cursor_obj.execute(sql,(ni,))
-        rows = cursor_obj.fetchall()
-        if not rows:
-            raise HTTPException(status_code=400, detail="Numero de identificacion no encontrado")
-        return rows
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_paciente.get(protocolos,numeroIdentificacion)
 @app.post("/insert/paciente", tags=["Paciente"])
-async def registrar_paciente(numeroIdentificacion:str,primerNombre:str,segundoNombre:str,primerApellido:str,segundoApellido:str,fechaNacimiento:str,peso:str,telefono:str,direccion:str,correoElectronico:str,Profesion:str,antecedentes:str,alergias:str,fk_codigoMunicipio:str):
-    columnas = ("numeroIdentificacion","primerNombre","segundoNombre","primerApellido","segundoApellido","fechaNacimiento","peso","telefono","direccion","correoElectronico","Profesion","antecedentes","alergias","fk_codigoMunicipio")
-    sql = com_sql.insertar_datos("paciente",columnas)
-    try:
-        cursor_obj.execute(sql,(numeroIdentificacion,primerNombre.upper(),segundoNombre.upper(),primerApellido.upper(),segundoApellido.upper(),fechaNacimiento,peso,telefono,direccion,correoElectronico,Profesion,antecedentes,alergias,fk_codigoMunicipio))
-        cc.commit()
-        return {"mensaje":f"Se registro el paciente {numeroIdentificacion},{primerNombre},{primerApellido},{telefono},{correoElectronico} correctamente"}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+async def registrar_paciente(numeroIdentificacion:str,primerNombre:str,segundoNombre:str,primerApellido:str,segundoApellido:str,fechaNacimiento:str,peso:str,telefono:str,direccion:str,correoElectronico:str,profesion:str,antecedentes:str,alergias:str,fk_codigoMunicipio:str):
+    return t_paciente.post(
+        protocolos,
+        numeroIdentificacion,
+        primerNombre.upper(),
+        segundoNombre.upper(),
+        primerApellido.upper(),
+        segundoApellido.upper(),
+        fechaNacimiento,
+        peso,
+        telefono,
+        correoElectronico,
+        direccion,
+        profesion,
+        antecedentes,
+        alergias,
+        fk_codigoMunicipio,
+        )
 @app.put("/update/paciente", tags=["Paciente"])
-async def actualizar_paciente(numeroIdentificacion:str,primerNombre:str="",segundoNombre:str="",primerApellido:str="",segundoApellido:str="",fechaNacimiento:str="",peso:str="",telefono:str="",direccion:str="",correoElectronico:str="",Profesion:str="",antecedentes:str="",alergias:str="",fk_codigoMunicipio:str=""):
-    ni = ("numeroIdentificacion",numeroIdentificacion)
-    atributos = {"primerNombre":primerNombre.upper(),
-                 "segundoNombre":segundoNombre.upper(),
-                 "primerApellido":primerApellido.upper(),
-                 "segundoApellido":segundoApellido.upper(),
-                 "fechaNacimiento":fechaNacimiento,
-                 "peso":peso,
-                 "telefono":telefono,
-                 "direccion":direccion,
-                 "correoElectronico":correoElectronico,
-                 "Profesion":Profesion,
-                 "antecedentes":antecedentes,
-                 "alergias":alergias,
-                 "fk_codigoMunicipio":fk_codigoMunicipio
-                 }
-    sql, valores = com_sql.actualizar_datos("paciente",ni,atributos)
-    sql_consulta = com_sql.consulta_por_identificador("paciente",ni[0])
-    if len(ni[1]) < 1 or len(ni[1]) > 15:
-        raise HTTPException(status_code=400, detail="Numero de identificacion no valido, debe estar entre el rango de 1 a 15 caracteres")
-    try:
-        cursor_obj.execute(sql, tuple(valores))
-        cc.commit()
-        cursor_obj.execute(sql_consulta, (ni[1],))
-        rows = cursor_obj.fetchall()
-        return {"mensaje" : f"Se actualizo el paciente identificado {rows[0]["numeroIdentificacion"]}"}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+async def actualizar_paciente(numeroIdentificacion:str,primerNombre:str="",segundoNombre:str="",primerApellido:str="",segundoApellido:str="",fechaNacimiento:str="",peso:str="",telefono:str="",direccion:str="",correoElectronico:str="",profesion:str="",antecedentes:str="",alergias:str="",fk_codigoMunicipio:str=""):
+    return t_paciente.put(
+        protocolos,
+        numeroIdentificacion,
+        primerNombre = primerNombre.upper(),
+        segundoNombre = segundoNombre.upper(),
+        primerApellido = primerApellido.upper(),
+        segundoApellido = segundoApellido.upper(),
+        fechaNacimiento = fechaNacimiento,
+        peso = peso,
+        telefono = telefono,
+        correoElectronico = correoElectronico,
+        direccion = direccion,
+        profesion = profesion,
+        antecedentes = antecedentes,
+        alergias = alergias,
+        fk_codigoMunicipio = fk_codigoMunicipio,
+        )
 @app.delete("/delete/paciente", tags=["Paciente"])
 async def eliminar_paciente(numeroIdentificacion:str):
-    ni = numeroIdentificacion
-    sql_consultar = com_sql.consulta_por_identificador("paciente","numeroIdentificacion")
-    sql_eliminar = com_sql.eliminar_por_identificador("paciente","numeroIdentificacion")
-    if len(ni) < 1 or len(ni) > 15:
-        raise HTTPException(status_code=400, detail="Numero de identificacion no valido, debe estar entre el rango de 1 a 15 caracteres")
-    try:
-        cursor_obj.execute(sql_consultar,(ni,))
-        rows = cursor_obj.fetchall()
-        if not rows:
-            raise HTTPException(status_code=400, detail="Numero de identificacion no encontrado")
-        cursor_obj.execute(sql_eliminar,(ni,))
-        cc.commit()
-        return{"mensaje" : f"Se elimino el paciente identificado {rows[0]["numeroIdentificacion"]}, {rows[0]["primerNombre"]} {rows[0]["primerApellido"]}"}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_paciente.delete(protocolos,numeroIdentificacion)
 
 # cita
+t_cita = SistemaCRUD(
+    tabla="cita",
+    identificador={"codigoCita":[16,"fijo"]},
+    fecha=None,
+    hora=None,
+    patologia=None,
+    tratamientoRecomendado=None,
+    precio=None,
+    observacion=None,
+    fk_codigoEstado=None,
+    )
 @app.get("/select/cita", tags=["Cita"])
 async def consultar_id_cita(codigoCita:str):
-    ct = codigoCita
-    sql = com_sql.consulta_por_identificador("cita","codigoCita")
-    if len(ct) != 16:
-        raise HTTPException(status_code=400, detail="Codigo no valido, debe constar de 16 caracteres")
-    try:
-        cursor_obj.execute(sql,(ct,))
-        rows = cursor_obj.fetchall()
-        if not rows:
-            raise HTTPException(status_code=400, detail="Codigo no encontrado")
-        return rows
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_cita.get(protocolos,codigoCita)
 @app.post("/insert/cita", tags=["Cita"])
-async def registrar_cita(codigoCita:str,fecha:str,hora:str,patologias:str,tratamientoRecomendado:str,precio:int,observacion:str,fk_codigoEstado:str):
-    columnas = ("codigoCita","fecha","hora","patologias","tratamientoRecomendado","precio","observacion","fk_codigoEstado")
-    sql = com_sql.insertar_datos("cita",columnas)
-    try:
-        cursor_obj.execute(sql,(codigoCita,fecha,hora,patologias,tratamientoRecomendado,precio,observacion,fk_codigoEstado))
-        cc.commit()
-        return {"mensaje":f"Se registro el cita {codigoCita},{fecha},{hora},{patologias},{tratamientoRecomendado},{precio},{observacion},{fk_codigoEstado} correctamente"}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+async def registrar_cita(codigoCita:str,fecha:str,hora:str,patologia:str,tratamientoRecomendado:str,precio:int,observacion:str,fk_codigoEstado:str):
+    return t_cita.post(
+        protocolos,
+        codigoCita,
+        fecha,
+        hora,
+        patologia,
+        tratamientoRecomendado,
+        precio,
+        observacion,
+        fk_codigoEstado,
+        )
 @app.put("/update/cita", tags=["Cita"])
-async def actualizar_cita(codigoCita:str,fecha:str="",hora:str="",patologias:str="",tratamientoRecomendado:str="",precio:int=0,observacion:str="",fk_codigoEstado:str=""):
-    ct = ("codigoCita",codigoCita)
-    atributos = {"fecha":fecha,
-                 "hora":hora,
-                 "patologias":patologias,
-                 "tratamientoRecomendado":tratamientoRecomendado,
-                 "precio":precio,
-                 "observacion":observacion,
-                 "fk_codigoEstado":fk_codigoEstado
-                 }
-    sql, valores = com_sql.actualizar_datos("cita",ct,atributos)
-    sql_consulta = com_sql.consulta_por_identificador("cita",ct[0])
-    if len(ct[1]) != 16:
-        raise HTTPException(status_code=400, detail="Codigo no valido, debe constar de 16 caracteres")
-    try:
-        cursor_obj.execute(sql, tuple(valores))
-        cc.commit()
-        cursor_obj.execute(sql_consulta, (ct[1],))
-        rows = cursor_obj.fetchall()
-        return {"mensaje" : f"Se actualizo la cita identificada {rows[0]["codigoCita"]}"}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+async def actualizar_cita(codigoCita:str,fecha:str="",hora:str="",patologia:str="",tratamientoRecomendado:str="",precio:int=0,observacion:str="",fk_codigoEstado:str=""):
+    return t_cita.put(
+        protocolos,
+        codigoCita,
+        fecha = fecha,
+        hora = hora,
+        patologia = patologia,
+        tratamientoRecomendado = tratamientoRecomendado,
+        precio = precio,
+        observacion = observacion,
+        fk_codigoEstado = fk_codigoEstado,
+        )
 @app.delete("/delete/cita", tags=["Cita"])
 async def eliminar_cita(codigoCita:str):
-    ct = codigoCita
-    sql_consultar = com_sql.consulta_por_identificador("cita","codigoCita")
-    sql_eliminar = com_sql.eliminar_por_identificador("cita","codigoCita")
-    if len(ct) != 16:
-        raise HTTPException(status_code=400, detail="Codigo no valido, debe constar de 16 caracteres")
-    try:
-        cursor_obj.execute(sql_consultar,(ct,))
-        rows = cursor_obj.fetchall()
-        if not rows:
-            raise HTTPException(status_code=400, detail="Codigo no encontrado")
-        cursor_obj.execute(sql_eliminar,(ct,))
-        cc.commit()
-        return{"mensaje" : f"Se elimino la cita identificada {rows[0]["codigoCita"]}"}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_cita.delete(protocolos,codigoCita)
 
 # tratamiento
+t_tratamiento = SistemaCRUD(
+    tabla="tratamiento",
+    identificador={"codigoTratamiento":[16,"fijo"]},
+    nombreTratamiento=None,
+    fk_numeroIdentificacion=None,
+    )
 @app.get("/select/tratamiento", tags=["Tratamiento"])
 async def consultar_id_tratamiento(codigoTratamiento:str):
-    ct = codigoTratamiento
-    sql = com_sql.consulta_por_identificador("tratamiento","codigoTratamiento")
-    if len(ct) != 16:
-        raise HTTPException(status_code=400, detail="Codigo no valido, debe constar de 16 caracteres")
-    try:
-        cursor_obj.execute(sql,(ct,))
-        rows = cursor_obj.fetchall()
-        if not rows:
-            raise HTTPException(status_code=400, detail="Codigo no encontrado")
-        return rows
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_tratamiento.get(protocolos,codigoTratamiento)
 @app.post("/insert/tratamiento", tags=["Tratamiento"])
 async def registrar_tratamiento(codigoTratamiento:str,nombreTratamiento:str,fk_numeroIdentificacion:str):
-    columnas = ("codigoTratamiento","nombreTratamiento","fk_numeroIdentificacion")
-    sql = com_sql.insertar_datos("tratamiento",columnas)
-    try:
-        cursor_obj.execute(sql,(codigoTratamiento,nombreTratamiento,fk_numeroIdentificacion))
-        cc.commit()
-        return {"mensaje":f"Se registro el tratamiento {codigoTratamiento},{nombreTratamiento},{fk_numeroIdentificacion} correctamente"}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_tratamiento.post(
+        protocolos,
+        codigoTratamiento,
+        nombreTratamiento,
+        fk_numeroIdentificacion,
+        )
 @app.put("/update/tratamiento", tags=["Tratamiento"])
 async def actualizar_tratamiento(codigoTratamiento:str,nombreTratamiento:str="",fk_numeroIdentificacion:str=""):
-    ct = ("codigoTratamiento", codigoTratamiento)
-    atributos = {"nombreTratamiento":nombreTratamiento,
-                 "fk_numeroIdentificacion":fk_numeroIdentificacion
-                }
-    sql, valores = com_sql.actualizar_datos("tratamiento",ct,atributos)
-    sql_consulta = com_sql.consulta_por_identificador("tratamiento",ct[0])
-    if len(ct[1]) != 16:
-        raise HTTPException(status_code=400, detail="Codigo no valido, debe constar de 16 caracteres")
-    try:
-        cursor_obj.execute(sql, tuple(valores))
-        cc.commit()
-        cursor_obj.execute(sql_consulta, (ct[1],))
-        rows = cursor_obj.fetchall()
-        return {"mensaje" : f"Se actualizo el tratamiento {rows[0]["nombreTratamiento"]}"}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_tratamiento.put(
+        protocolos,
+        codigoTratamiento,
+        nombreTratamiento = nombreTratamiento,
+        fk_numeroIdentificacion = fk_numeroIdentificacion,
+        )
 @app.delete("/delete/tratamiento", tags=["Tratamiento"])
 async def eliminar_tratamiento(codigoTratamiento:str):
-    ct = codigoTratamiento
-    sql_consultar = com_sql.consulta_por_identificador("tratamiento","codigoTratamiento")
-    sql_eliminar = com_sql.eliminar_por_identificador("tratamiento","codigoTratamiento")
-    if len(ct) != 16:
-        raise HTTPException(status_code=400, detail="Codigo no valido, debe constar de 16 caracteres")
-    try:
-        cursor_obj.execute(sql_consultar,(ct,))
-        rows = cursor_obj.fetchall()
-        if not rows:
-            raise HTTPException(status_code=400, detail="Codigo no encontrado")
-        cursor_obj.execute(sql_eliminar,(ct,))
-        cc.commit()
-        return{"mensaje" : f"Se elimino el tratamiento identificado {rows[0]["codigoTratamiento"]}, {rows[0]["nombreTratamiento"]} "}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_tratamiento.delete(protocolos, codigoTratamiento)
 
 # municipio
+t_municipio = SistemaCRUD(
+    tabla="municipio",
+    identificador={"codigoMunicipio":[5,"fijo"]},
+    nombreMunicipio=None,
+    fk_codigoDepartamento=None,
+    )
 @app.get("/select/municipio", tags=["Municipio"])
 async def consultar_id_municipio(codigoMunicipio:str):
-    cm = codigoMunicipio
-    sql = com_sql.consulta_por_identificador("municipio","codigoMunicipio")
-    if len(cm) != 5:
-        raise HTTPException(status_code=400, detail="Codigo no valido, debe constar de 5 caracteres")
-    try:
-        cursor_obj.execute(sql,(cm,))
-        rows = cursor_obj.fetchall()
-        if not rows:
-            raise HTTPException(status_code=400, detail="Codigo no encontrado")
-        return rows
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_municipio.get(protocolos,codigoMunicipio)
 @app.post("/insert/municipio", tags=["Municipio"])
 async def registrar_municipio(codigoMunicipio:str,nombreMunicipio:str,fk_codigoDepartamento:str):
-    columnas = ("codigoMunicipio","nombreMunicipio","fk_codigoDepartamento")
-    sql = com_sql.insertar_datos("municipio",columnas)
-    try:
-        cursor_obj.execute(sql,(codigoMunicipio,nombreMunicipio,fk_codigoDepartamento))
-        cc.commit()
-        return {"mensaje":f"Se registro el municipio {codigoMunicipio},{nombreMunicipio},{fk_codigoDepartamento} correctamente"}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_municipio.post(
+        protocolos,
+        codigoMunicipio,
+        nombreMunicipio.upper(),
+        fk_codigoDepartamento,
+        )
 @app.put("/update/municipio", tags=["Municipio"])
 async def actualizar_municipio(codigoMunicipio:str,nombreMunicipio:str="",fk_codigoDepartamento:str=""):
-    cm = ("codigoMunicipio",codigoMunicipio)
-    atributos = {"nombreMunicipio":nombreMunicipio,
-                 "fk_codigoDepartamento":fk_codigoDepartamento
-                 }
-    sql, valores = com_sql.actualizar_datos("municipio",cm,atributos)
-    sql_consulta = com_sql.consulta_por_identificador("municipio",cm[0])
-    if len(cm[1]) != 5:
-        raise HTTPException(status_code=400, detail="Codigo no valido, debe constar de 5 caracteres")
-    try:
-        cursor_obj.execute(sql, tuple(valores))
-        cc.commit()
-        cursor_obj.execute(sql_consulta, (cm[1],))
-        rows = cursor_obj.fetchall()
-        return {"mensaje" : f"Se actualizo el municipio {rows[0]["nombreMunicipio"]}"}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_municipio.put(
+        protocolos,
+        codigoMunicipio,
+        nombreMunicipio = nombreMunicipio.upper(),
+        fk_codigoDepartamento = fk_codigoDepartamento,
+        )
 @app.delete("/delete/municipio", tags=["Municipio"])
 async def eliminar_municipio(codigoMunicipio:str):
-    cm = codigoMunicipio
-    sql_consultar = com_sql.consulta_por_identificador("municipio","codigoMunicipio")
-    sql_eliminar = com_sql.eliminar_por_identificador("municipio","codigoMunicipio")
-    if len(cm) != 5:
-        raise HTTPException(status_code=400, detail="Codigo no valido, debe constar de 5 caracteres")
-    try:
-        cursor_obj.execute(sql_consultar,(cm,))
-        rows = cursor_obj.fetchall()
-        if not rows:
-            raise HTTPException(status_code=400, detail="Codigo no encontrado")
-        cursor_obj.execute(sql_eliminar,(cm,))
-        cc.commit()
-        return{"mensaje" : f"Se elimino el municipio identificado {rows[0]["codigoMunicipio"]}, {rows[0]["nombreMunicipio"]} "}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_municipio.delete(protocolos,codigoMunicipio)
 
 # departamento
+t_departamento = SistemaCRUD(
+    tabla="departamento",
+    identificador={"codigoDepartamento":[2,"fijo"]},
+    nombreDepartamento=None,
+    )
 @app.get("/select/departamento", tags=["Departamento"])
 async def consultar_id_departamento(codigoDepartamento:str):
-    cd = codigoDepartamento
-    sql = com_sql.consulta_por_identificador("departamento","codigoDepartamento")
-    if len(cd) != 2:
-        raise HTTPException(status_code=400, detail="Codigo no valido, debe constar de 2 caracteres")
-    try:
-        cursor_obj.execute(sql,(cd,))
-        rows = cursor_obj.fetchall()
-        if not rows:
-            raise HTTPException(status_code=400, detail="Codigo no encontrado")
-        return rows
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_departamento.get(protocolos,codigoDepartamento)
 @app.post("/insert/departamento", tags=["Departamento"])
 async def registrar_departamento(codigoDepartamento:str,nombreDepartamento:str):
-    columnas = ("codigoDepartamento","nombreDepartamento")
-    sql = com_sql.insertar_datos("departamento",columnas)
-    try:
-        cursor_obj.execute(sql,(codigoDepartamento,nombreDepartamento.upper()))
-        cc.commit()
-        return {"mensaje" : f"Se registro el departamento {codigoDepartamento}, {nombreDepartamento} correctamnte"}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_departamento.post(
+        protocolos,
+        codigoDepartamento,
+        nombreDepartamento.upper(),
+        )
 @app.put("/update/departamento", tags=["Departamento"])
 async def actualizar_departamento(codigoDepartamento:str,nombreDepartamento:str=""):
-    cd = ("codigoDepartamento",codigoDepartamento)
-    atributos = {"nombreDepartamento":nombreDepartamento}
-    sql, valores = com_sql.actualizar_datos("departamento",cd,atributos)
-    sql_consulta = com_sql.consulta_por_identificador("departamento",cd[0])
-    if len(cd[1]) != 2:
-        raise HTTPException(status_code=400, detail="Codigo no valido, debe constar de 2 caracteres")
-    try:
-        cursor_obj.execute(sql, tuple(valores))
-        cc.commit()
-        cursor_obj.execute(sql_consulta, (cd[1],))
-        rows = cursor_obj.fetchall()
-        return {"mensaje" : f"Se actualizo el departamento {rows[0]["nombreDepartamento"]}"}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_departamento.put(
+        protocolos,
+        codigoDepartamento,
+        nombreDepartamento = nombreDepartamento.upper(),
+    )
 @app.delete("/delete/departamento", tags=["Departamento"])
 async def eliminar_departamento(codigoDepartamento:str=""):
-    cd = codigoDepartamento
-    sql_consultar = com_sql.consulta_por_identificador("departamento","codigoDepartamento")
-    sql_eliminar = com_sql.eliminar_por_identificador("departamento","codigoDepartamento")
-    if len(cd) != 2:
-        raise HTTPException(status_code=400, detail="Codigo no valido, debe constar de 2 caracteres")
-    try:
-        cursor_obj.execute(sql_consultar,(cd,))
-        rows = cursor_obj.fetchall()
-        if not rows:
-            raise HTTPException(status_code=400, detail="Codigo no encontrado")
-        cursor_obj.execute(sql_eliminar,(cd,))
-        cc.commit()
-        return{"mensaje" : f"Se elimino el departamento identificado {rows[0]["codigoDepartamento"]}, {rows[0]["nombreDepartamento"]} "}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_departamento.delete(protocolos,codigoDepartamento)
 
 # estado
+t_estado = SistemaCRUD(
+    tabla="estado",
+    identificador={"codigoEstado":[3,"fijo"]},
+    nombreEstado=None,
+    )
 @app.get("/select/estado", tags=["Estado"])
 async def consultar_id_estado(codigoEstado:str):
-    ce = codigoEstado
-    sql = com_sql.consulta_por_identificador("estado","codigoEstado")
-    if len(ce) != 3:
-        raise HTTPException(status_code=400, detail="Codigo no valido, debe constar de 3 caracteres")
-    try:
-        cursor_obj.execute(sql,(ce,))
-        rows = cursor_obj.fetchall()
-        if not rows:
-            raise HTTPException(status_code=400, detail="Codigo no encontrado")
-        return rows
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_estado.get(protocolos,codigoEstado)
 @app.post("/insert/estado", tags=["Estado"])
 async def registrar_estado(codigoEstado:str,nombreEstado:str):
-    columnas = ("codigoEstado","nombreEstado")
-    sql = com_sql.insertar_datos("estado",columnas)
-    try:
-        cursor_obj.execute(sql,(codigoEstado,nombreEstado))
-        cc.commit()
-        return {"mensaje":f"Se registro el estado {codigoEstado},{nombreEstado} correctamente"}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_estado.post(
+        protocolos,
+        codigoEstado,
+        nombreEstado.title(),
+        )
 @app.put("/update/estado", tags=["Estado"])
 async def actualizar_estado(codigoEstado:str,nombreEstado:str=""):
-    ce = ("codigoEstado",codigoEstado)
-    atributos = {"nombreEstado":nombreEstado}
-    sql, valores = com_sql.actualizar_datos("estado",ce,atributos)
-    sql_consulta = com_sql.consulta_por_identificador("estado",ce[0])
-    if len(ce[1]) != 3:
-        raise HTTPException(status_code=400, detail="Codigo no valido, debe constar de 3 caracteres")
-    try:
-        cursor_obj.execute(sql, tuple(valores))
-        cc.commit()
-        cursor_obj.execute(sql_consulta, (ce[1],))
-        rows = cursor_obj.fetchall()
-        return {"mensaje" : f"Se actualizo el esado {rows[0]["nombreEstado"]}"}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_estado.put(
+        protocolos,
+        codigoEstado,
+        nombreEstado = nombreEstado.title(),
+    )
 @app.delete("/delete/estado", tags=["Estado"])
 async def eliminar_estado(codigoEstado:str):
-    ce = codigoEstado
-    sql_consultar = com_sql.consulta_por_identificador("estado","codigoEstado")
-    sql_eliminar = com_sql.eliminar_por_identificador("estado","codigoEstado")
-    if len(ce) != 3:
-        raise HTTPException(status_code=400, detail="Codigo no valido, debe constar de 3 caracteres")
-    try:
-        cursor_obj.execute(sql_consultar,(ce,))
-        rows = cursor_obj.fetchall()
-        if not rows:
-            raise HTTPException(status_code=400, detail="Codigo no encontrado")
-        cursor_obj.execute(sql_eliminar,(ce,))
-        cc.commit()
-        return{"mensaje" : f"Se elimino el estado identificado {rows[0]["codigoEstado"]}, {rows[0]["nombreEstado"]} "}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_estado.delete(protocolos,codigoEstado)
 
 # imagen
+t_imagen = SistemaCRUD(
+    tabla="imagen",
+    identificador={"refImagen":[32,"rango"]},
+    fk_codigoCita=None,
+    )
 @app.get("/select/imagen", tags=["Imagen"])
 async def consultar_id_imagen(refImagen:str):
-    ri = refImagen
-    sql = com_sql.consulta_por_identificador("imagen","refImagen")
-    if len(ri) < 1 or len(ri) > 32:
-        raise HTTPException(status_code=400, detail="Referencia no valido, debe constar entre 1 y 32 caracteres")
-    try:
-        cursor_obj.execute(sql,(ri,))
-        rows = cursor_obj.fetchall()
-        if not rows:
-            raise HTTPException(status_code=400, detail="Referencia no encontrada")
-        return rows
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_imagen.get(protocolos,refImagen)
 @app.post("/insert/imagen", tags=["Imagen"])
 async def registrar_imagen(refImagen:str,fk_codigoCita:str):
-    columnas = ("refImagen","fk_codigoCita")
-    sql = com_sql.insertar_datos("imagen",columnas)
-    try:
-        cursor_obj.execute(sql,(refImagen,fk_codigoCita))
-        cc.commit()
-        return {"mensaje":f"Se registro la imagen {refImagen},{fk_codigoCita} correctamente"}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_imagen.post(
+        protocolos,
+        refImagen,
+        fk_codigoCita,
+        )
 @app.put("/update/imagen", tags=["Imagen"])
 async def actualizar_imagen(refImagen:str,fk_codigoCita:str=""):
-    ri = ("refImagen", refImagen)
-    atributos = {"fk_codigoCita":fk_codigoCita}
-    sql, valores = com_sql.actualizar_datos("imagen",ri,atributos)
-    sql_consulta = com_sql.consulta_por_identificador("imagen",ri[0])
-    if len(ri[1]) < 1 or len(ri[1]) > 32:
-        raise HTTPException(status_code=400, detail="Referencia no valido, debe constar entre 1 y 32 caracteres")
-    try:
-        cursor_obj.execute(sql, tuple(valores))
-        cc.commit()
-        cursor_obj.execute(sql_consulta, (ri[1],))
-        rows = cursor_obj.fetchall()
-        return {"mensaje" : f"Se actualizo la imagen identidicada {rows[0]["refImagen"]}"}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_imagen.put(
+        protocolos,
+        refImagen,
+        fk_codigoCita = fk_codigoCita,
+        )
 @app.delete("/delete/imagen", tags=["Imagen"])
 async def eliminar_imagen(refImagen:str):
-    ri = refImagen
-    sql_consultar = com_sql.consulta_por_identificador("imagen","refImagen")
-    sql_eliminar = com_sql.eliminar_por_identificador("imagen","refImagen")
-    if len(ri) < 1 or len(ri) > 32:
-        raise HTTPException(status_code=400, detail="Referencia no valido, debe constar entre 1 y 32 caracteres")
-    try:
-        cursor_obj.execute(sql_consultar,(ri,))
-        rows = cursor_obj.fetchall()
-        if not rows:
-            raise HTTPException(status_code=400, detail="Referencia no encontrada")
-        cursor_obj.execute(sql_eliminar,(ri,))
-        cc.commit()
-        return{"mensaje" : f"Se elimino la imagen identificada {rows[0]["refImagen"]}"}
-    except mariadb.Error as e:
-        raise HTTPException(status_code=500, detail=f"Error {e}")
+    return t_imagen.delete(protocolos,refImagen)
 
-# # citaportratamiento
-# @app.get("/select/citaportratamiento")
-# async def consultar_id_citaportratamiento(id:str):
-#     sql = f"""
-# SELECT * FROM citaportratamiento WHERE  = ;
-# """
-#     if len(id) < 0 or len(id) > 1:
-#         raise HTTPException(status_code=400, detail="- no valido") 
-#     try:
-#         cursor_obj.execute(sql)
-#         rows = cursor_obj.fetchall()
-#         if not rows:
-#             raise HTTPException(status_code=400, detail="- no encontrado")
-#         return rows
-#     except mariadb.Error as e:
-#         raise HTTPException(status_code=500, detail=f"Error {e}")
-# # c @app.post("/insert")
-# # u @app.put("/update")
-# # d @app.delete("/delete")
+# SEGURIDAD
+
+# usuario
+t_usuario = SistemaCRUD(
+    tabla="usuario",
+    identificador={"codigoUsuario":[10,"rango"]},
+    acceso=None,
+    contraseña=None,
+    )
+@app.get("/select/usuario", tags=["Usuario"])
+async def consultar_id_usuario(codigoUsuario:str):
+    return t_usuario.get(protocolos,codigoUsuario)
+@app.post("/insert/usuario", tags=["Usuario"])
+async def registrar_usuario(codigoUsuario:str,acceso:str,contraseña:str):
+    return t_usuario.post(
+        protocolos,
+        codigoUsuario,
+        acceso,
+        contraseña,
+        )
+@app.put("/update/usuario", tags=["Usuario"])
+async def actualizar_usuario(codigoUsuario:str,acceso:str="",contraseña:str=""):
+    return t_usuario.put(
+        protocolos,
+        codigoUsuario,
+        acceso = acceso,
+        contraseña = contraseña,
+        )
+@app.delete("/delete/usuario", tags=["Usuario"])
+async def eliminar_usuario(codigoUsuario:str):
+    return t_usuario.delete(protocolos,codigoUsuario)
+
+# rol
+t_rol = SistemaCRUD(
+    tabla="rol",
+    identificador={"codigoRol":[3,"fijo"]},
+    descripcionRol=None,
+    )
+@app.get("/select/rol", tags=["Rol"])
+async def consultar_id_rol(codigoRol:str):
+    return t_rol.get(protocolos,codigoRol)
+@app.post("/insert/rol", tags=["Rol"])
+async def registrar_rol(codigoRol:str,descripcionRol:str):
+    return t_rol.post(
+        protocolos,
+        codigoRol,
+        descripcionRol,
+        )
+@app.put("/update/rol", tags=["Rol"])
+async def actualizar_rol(codigoRol:str,descripcionRol:str=""):
+    return t_rol.put(
+        protocolos,
+        codigoRol,
+        descripcionRol = descripcionRol,
+        )
+@app.delete("/delete/rol", tags=["Rol"])
+async def eliminar_rol(codigoRol:str):
+    return t_rol.delete(protocolos,codigoRol)
+
+# permiso
+t_permiso = SistemaCRUD(
+    tabla="permiso",
+    identificador={"codigoPermiso":[3,"fijo"]},
+    descripcionPermiso=None,
+    estadoPermiso=None,
+    )
+@app.get("/select/permiso", tags=["Permiso"])
+async def consultar_id_permiso(codigoPermiso:str):
+    return t_permiso.get(protocolos,codigoPermiso)
+@app.post("/insert/permiso", tags=["Permiso"])
+async def registrar_permiso(codigoPermiso:str,descripcionPermiso:str,estadoPermiso:str):
+    return t_permiso.post(
+        protocolos,
+        codigoPermiso,
+        descripcionPermiso,
+        estadoPermiso,
+        )
+@app.put("/update/permiso", tags=["Permiso"])
+async def actualizar_permiso(codigoPermiso:str,descripcionPermiso:str="",estadoPermiso:str=""):
+    return t_permiso.put(
+        protocolos,
+        codigoPermiso,
+        descripcionPermiso = descripcionPermiso,
+        estadoPermiso = estadoPermiso,
+        )
+@app.delete("/delete/permiso", tags=["Permiso"])
+async def eliminar_permiso(codigoPermiso:str):
+    return t_permiso.delete(protocolos,codigoPermiso)
