@@ -1,5 +1,6 @@
 import mariadb
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import datos_perfil_db as dp
 import comandos_sql as com_sql
 from objeto_crud import SistemaCRUD
@@ -24,6 +25,16 @@ except mariadb.Error as e:
 cursor_obj = cc.cursor(dictionary=True)
 app = FastAPI()
 
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 protocolos = {
     "HTTPException":HTTPException,
     "cursor_obj":cursor_obj,
@@ -33,15 +44,15 @@ protocolos = {
 
 """
 Definición de rutas  
-@app.get("/")  
-async def root(): 
-    return {"mensaje": "Hola desde FastAPI con MariaDB"}
-
 c @app.post("/insert")
 r @app.get("/select")
 u @app.put("/update")
 d @app.delete("/delete")
 """
+@app.get("/")  
+async def Check(): 
+    return {"mensaje": "Hola, este es el backend de HSP"}
+
 @app.get("/selectall/{nombretabla}")
 async def consultar_datos_general(nombretabla:str,pagina:int=1):
     sql = com_sql.consulta_paginada(nombretabla,pagina)
