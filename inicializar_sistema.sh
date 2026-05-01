@@ -1,4 +1,4 @@
-#!/din/bash
+#!/bin/bash
 cd /home/servidorhsp
 source entorno/bin/activate
 cd backend_hsp
