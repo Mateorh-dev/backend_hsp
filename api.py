@@ -23,7 +23,7 @@ except mariadb.Error as e:
     exit(1)
 
 cursor_obj = cc.cursor(dictionary=True)
-app = FastAPI(root_path="/api")
+app = FastAPI()
 
 origins = ["*"]
 
