@@ -90,6 +90,9 @@ t_paciente = SistemaCRUD(
 @app.get("/select/paciente", tags=["Paciente"])
 async def consultar_id_paciente(numeroIdentificacion:str):
     return t_paciente.get(protocolos,numeroIdentificacion)
+@app.get("/select/like/paciente", tags=["Paciente"])
+async def consultar_like_paciente(columna:str,identificador:str):
+    return t_paciente.get_like(protocolos,columna,identificador)
 @app.post("/insert/paciente", tags=["Paciente"])
 async def registrar_paciente(numeroIdentificacion:str,primerNombre:str,segundoNombre:str,primerApellido:str,segundoApellido:str,fechaNacimiento:str,peso:str,telefono:str,direccion:str,correoElectronico:str,profesion:str,antecedentes:str,alergias:str,fk_codigoMunicipio:str):
     return t_paciente.post(
@@ -147,6 +150,9 @@ t_cita = SistemaCRUD(
 @app.get("/select/cita", tags=["Cita"])
 async def consultar_id_cita(codigoCita:str):
     return t_cita.get(protocolos,codigoCita)
+@app.get("/select/like/cita", tags=["Cita"])
+async def consultar_like_cita(columna:str,identificador:str):
+    return t_cita.get_like(protocolos,columna,identificador)
 @app.post("/insert/cita", tags=["Cita"])
 async def registrar_cita(codigoCita:str,fecha:str,hora:str,patologia:str,tratamientoRecomendado:str,precio:int,observacion:str,fk_codigoEstado:str):
     return t_cita.post(
@@ -187,6 +193,9 @@ t_tratamiento = SistemaCRUD(
 @app.get("/select/tratamiento", tags=["Tratamiento"])
 async def consultar_id_tratamiento(codigoTratamiento:str):
     return t_tratamiento.get(protocolos,codigoTratamiento)
+@app.get("/select/like/tratamiento", tags=["Tratamiento"])
+async def consultar_like_tratamiento(columna:str,identificador:str):
+    return t_tratamiento.get_like(protocolos,columna,identificador)
 @app.post("/insert/tratamiento", tags=["Tratamiento"])
 async def registrar_tratamiento(codigoTratamiento:str,nombreTratamiento:str,fk_numeroIdentificacion:str):
     return t_tratamiento.post(
