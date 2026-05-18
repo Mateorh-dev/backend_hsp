@@ -6,9 +6,9 @@ def consulta_por_identificador(tabla:str,identificador:str):
     return f"""
 SELECT * FROM {tabla} WHERE {identificador}=?;
 """
-def consulta_por_coincidencia(tabla:str,columna:str):
+def consulta_por_coincidencia(tabla:str,columna:str,identificador:str):
     return f"""
-SELECT * FROM {tabla} WHERE {columna} LIKE ? ORDER BY {columna} DESC LIMIT 20;
+SELECT * FROM {tabla} WHERE {columna} LIKE ? ORDER BY {identificador} DESC LIMIT 20;
 """
 def eliminar_por_identificador(tabla:str,identificador:str):
     return f"""
