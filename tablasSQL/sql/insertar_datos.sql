@@ -1,4 +1,4 @@
-USE HSP_DB
+-- USE HSP_DB
 
 INSERT INTO estado (codigoEstado,nombreEstado)
 VALUES

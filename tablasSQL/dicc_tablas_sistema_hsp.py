@@ -30,6 +30,7 @@ tablas = {
     "tratamiento":{
         "codigoTratamiento":[Char(16), "PK"],
         "nombreTratamiento":[Text(), "NN"],
+        "descripcionTratamiento":[Text()],
         "paciente.numeroIdentificacion":["FK"],
     },
     "citaportratamiento":{
