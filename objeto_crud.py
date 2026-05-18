@@ -51,7 +51,7 @@ class SistemaCRUD:
         cursor_obj = protocolos['cursor_obj']
         mariadb = protocolos['mariadb']
 
-        nombre_id = self.id.keys()[0]
+        nombre_id = list(self.id.keys())[0]
 
         sql = com_sql.consulta_por_coincidencia(self.tabla,columna,nombre_id)
 
