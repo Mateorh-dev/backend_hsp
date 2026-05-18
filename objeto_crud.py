@@ -46,6 +46,24 @@ class SistemaCRUD:
             return rows
         except mariadb.Error as e:
             raise HTTPException(status_code=500, detail=f"Error: {e}")
+    def get_like(self, protocolos:dict, columna:str, identificador):
+        HTTPException = protocolos['HTTPException']
+        cursor_obj = protocolos['cursor_obj']
+        mariadb = protocolos['mariadb']
+
+        sql = com_sql.consulta_por_coincidencia(self.tabla,columna)
+
+        if not columna in list(self.atributos.keys()):
+            raise HTTPException(status_code=400, detail=f"Valor {columna} no valido")
+
+        try:
+            cursor_obj.execute(sql,(identificador,))
+            rows = cursor_obj.fetchall()
+            if not rows:
+                raise HTTPException(status_code=400, detail=f"{columna}:: ({identificador}) no encontrado")
+            return rows
+        except mariadb.Error as e:
+            raise HTTPException(status_code=500, detail=f"Error: {e}")
     def post(self, protocolos:dict, *valores):
         HTTPException = protocolos['HTTPException']
         cursor_obj = protocolos['cursor_obj']
