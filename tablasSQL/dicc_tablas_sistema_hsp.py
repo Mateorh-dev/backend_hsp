@@ -13,9 +13,9 @@ tablas = {
     },
     "paciente":{
         "numeroIdentificacion": [Varchar(15), "PK"],
-        "primerNombre":[Varchar(25),"NN"],
+        "primerNombre":[Varchar(25), "NN"],
         "segundoNombre":[Varchar(25)],
-        "primerApellido":[Varchar(25),"NN"],
+        "primerApellido":[Varchar(25), "NN"],
         "segundoApellido":[Varchar(25)],
         "fechaNacimiento":[Date()],
         "peso":[Varchar(10)],
@@ -28,7 +28,7 @@ tablas = {
         "municipio.codigoMunicipio":["FK"],
     },
     "tratamiento":{
-        "codigoTratamiento":[Char(16), "PK"],
+        "codigoTratamiento":[Int(), "PK", "AUTO"],
         "nombreTratamiento":[Text(), "NN"],
         "descripcionTratamiento":[Text()],
         "paciente.numeroIdentificacion":["FK"],
@@ -38,7 +38,7 @@ tablas = {
         "cita.codigoCita":["FK"],
     },
     "cita":{
-        "codigoCita":[Char(16),"PK"],
+        "codigoCita":[Int(), "PK", "AUTO"],
         "fecha":[Date(), "NN"],
         "hora":[Time(), "NN"],
         "patologia":[Text()],
