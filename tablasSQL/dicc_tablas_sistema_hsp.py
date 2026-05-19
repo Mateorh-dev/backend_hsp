@@ -34,6 +34,7 @@ tablas = {
         "paciente.numeroIdentificacion":["FK"],
     },
     "citaportratamiento":{
+        "codigoCitaPorTratamiento":[Int(), "PK", "AUTO"],
         "tratamiento.codigoTratamiento":["FK"],
         "cita.codigoCita":["FK"],
     },
