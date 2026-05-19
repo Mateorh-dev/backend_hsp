@@ -107,6 +107,8 @@ def DiccionarioSQL(diccionario:dict):
             valores = list(tablas_creadas.get(fk_tabla).get(fk_titulo))
             valores.remove("PK")
             valores.append("NN")
+            if "AUTO" in valores:
+                valores.remove("AUTO")
 
             columnas.append(AñadirTituloExtra(tabla,f"fk_{fk_titulo}",valores))
             columnas.append(LigarLlaveForaneaExtra(tabla,fk_tabla,fk_titulo))
