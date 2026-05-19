@@ -138,7 +138,7 @@ async def eliminar_paciente(numeroIdentificacion:str):
 # cita
 t_cita = SistemaCRUD(
     tabla="cita",
-    identificador={"codigoCita":[16,"fijo"]},
+    identificador={"codigoCita":[16,"rango"]},
     fecha=None,
     hora=None,
     patologia=None,
@@ -154,10 +154,9 @@ async def consultar_id_cita(codigoCita:str):
 async def consultar_like_cita(columna:str,valor:str):
     return t_cita.get_like(protocolos,columna,valor)
 @app.post("/insert/cita", tags=["Cita"])
-async def registrar_cita(codigoCita:str,fecha:str,hora:str,patologia:str,tratamientoRecomendado:str,precio:int,observacion:str,fk_codigoEstado:str):
+async def registrar_cita(fecha:str,hora:str,patologia:str,tratamientoRecomendado:str,precio:int,observacion:str,fk_codigoEstado:str):
     return t_cita.post(
         protocolos,
-        codigoCita,
         fecha,
         hora,
         patologia,
@@ -183,11 +182,44 @@ async def actualizar_cita(codigoCita:str,fecha:str="",hora:str="",patologia:str=
 async def eliminar_cita(codigoCita:str):
     return t_cita.delete(protocolos,codigoCita)
 
+# citaportratamiento
+t_citaportratamiento = SistemaCRUD(
+    tabla="citaportratamiento",
+    identificador={"codigoCitaPorTratamiento":[16,"rango"]},
+    fk_codigoTratamiento=None,
+    fk_codigoCita=None,
+    )
+@app.get("/select/citaportratamiento", tags=["CitaPorTratamiento"])
+async def consultar_id_tratamiento(codigoCitaPorTratamiento:str):
+    return t_citaportratamiento.get(protocolos,codigoCitaPorTratamiento)
+@app.get("/select/like/citaportratamiento", tags=["CitaPorTratamiento"])
+async def consultar_like_tratamiento(columna:str,valor:str):
+    return t_citaportratamiento.get_like(protocolos,columna,valor)
+@app.post("/insert/citaportratamiento", tags=["CitaPorTratamiento"])
+async def registrar_tratamiento(fk_codigoTratamiento:str,fk_codigoCita:str):
+    return t_citaportratamiento.post(
+        protocolos,
+        fk_codigoTratamiento,
+        fk_codigoCita,
+        )
+@app.put("/update/citaportratamiento", tags=["CitaPorTratamiento"])
+async def actualizar_tratamiento(codigoCitaPorTratamiento:str,fk_codigoTratamiento:str="",fk_codigoCita:str=""):
+    return t_citaportratamiento.put(
+        protocolos,
+        codigoCitaPorTratamiento,
+        fk_codigoTratamiento = fk_codigoTratamiento,
+        fk_codigoCita = fk_codigoCita,
+        )
+@app.delete("/delete/citaportratamiento", tags=["CitaPorTratamiento"])
+async def eliminar_tratamiento(codigoCitaPorTratamiento:str):
+    return t_citaportratamiento.delete(protocolos, codigoCitaPorTratamiento)
+
 # tratamiento
 t_tratamiento = SistemaCRUD(
     tabla="tratamiento",
-    identificador={"codigoTratamiento":[16,"fijo"]},
+    identificador={"codigoTratamiento":[16,"rango"]},
     nombreTratamiento=None,
+    descripcionTratamiento=None,
     fk_numeroIdentificacion=None,
     )
 @app.get("/select/tratamiento", tags=["Tratamiento"])
@@ -197,19 +229,20 @@ async def consultar_id_tratamiento(codigoTratamiento:str):
 async def consultar_like_tratamiento(columna:str,valor:str):
     return t_tratamiento.get_like(protocolos,columna,valor)
 @app.post("/insert/tratamiento", tags=["Tratamiento"])
-async def registrar_tratamiento(codigoTratamiento:str,nombreTratamiento:str,fk_numeroIdentificacion:str):
+async def registrar_tratamiento(nombreTratamiento:str,descripcionTratamiento:str,fk_numeroIdentificacion:str):
     return t_tratamiento.post(
         protocolos,
-        codigoTratamiento,
         nombreTratamiento,
+        descripcionTratamiento,
         fk_numeroIdentificacion,
         )
 @app.put("/update/tratamiento", tags=["Tratamiento"])
-async def actualizar_tratamiento(codigoTratamiento:str,nombreTratamiento:str="",fk_numeroIdentificacion:str=""):
+async def actualizar_tratamiento(codigoTratamiento:str,nombreTratamiento:str="",descripcionTratamiento:str="",fk_numeroIdentificacion:str=""):
     return t_tratamiento.put(
         protocolos,
         codigoTratamiento,
         nombreTratamiento = nombreTratamiento,
+        descripcionTratamiento = descripcionTratamiento,
         fk_numeroIdentificacion = fk_numeroIdentificacion,
         )
 @app.delete("/delete/tratamiento", tags=["Tratamiento"])
