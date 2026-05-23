@@ -95,8 +95,10 @@ async def consultar_like_paciente(columna:str,valor:str):
     return t_paciente.get_like(protocolos,columna,valor)
 @app.post("/insert/paciente", tags=["Paciente"])
 async def registrar_paciente(numeroIdentificacion:str,primerNombre:str,segundoNombre:str,primerApellido:str,segundoApellido:str,fechaNacimiento:str,peso:str,telefono:str,direccion:str,correoElectronico:str,profesion:str,antecedentes:str,alergias:str,fk_codigoMunicipio:str):
+    id_auto = False
     return t_paciente.post(
         protocolos,
+        id_auto,
         numeroIdentificacion,
         primerNombre.upper(),
         segundoNombre.upper(),
@@ -155,8 +157,10 @@ async def consultar_like_cita(columna:str,valor:str):
     return t_cita.get_like(protocolos,columna,valor)
 @app.post("/insert/cita", tags=["Cita"])
 async def registrar_cita(fecha:str,hora:str,patologia:str,tratamientoRecomendado:str,precio:int,observacion:str,fk_codigoEstado:str):
+    id_auto = True
     return t_cita.post(
         protocolos,
+        id_auto,
         fecha,
         hora,
         patologia,
@@ -197,8 +201,10 @@ async def consultar_like_tratamiento(columna:str,valor:str):
     return t_citaportratamiento.get_like(protocolos,columna,valor)
 @app.post("/insert/citaportratamiento", tags=["CitaPorTratamiento"])
 async def registrar_tratamiento(fk_codigoTratamiento:str,fk_codigoCita:str):
+    id_auto = True
     return t_citaportratamiento.post(
         protocolos,
+        id_auto,
         fk_codigoTratamiento,
         fk_codigoCita,
         )
@@ -230,8 +236,10 @@ async def consultar_like_tratamiento(columna:str,valor:str):
     return t_tratamiento.get_like(protocolos,columna,valor)
 @app.post("/insert/tratamiento", tags=["Tratamiento"])
 async def registrar_tratamiento(nombreTratamiento:str,descripcionTratamiento:str,fk_numeroIdentificacion:str):
+    id_auto = True
     return t_tratamiento.post(
         protocolos,
+        id_auto,
         nombreTratamiento,
         descripcionTratamiento,
         fk_numeroIdentificacion,
@@ -261,8 +269,10 @@ async def consultar_id_municipio(codigoMunicipio:str):
     return t_municipio.get(protocolos,codigoMunicipio)
 @app.post("/insert/municipio", tags=["Municipio"])
 async def registrar_municipio(codigoMunicipio:str,nombreMunicipio:str,fk_codigoDepartamento:str):
+    id_auto = False
     return t_municipio.post(
         protocolos,
+        id_auto,
         codigoMunicipio,
         nombreMunicipio.upper(),
         fk_codigoDepartamento,
@@ -290,8 +300,10 @@ async def consultar_id_departamento(codigoDepartamento:str):
     return t_departamento.get(protocolos,codigoDepartamento)
 @app.post("/insert/departamento", tags=["Departamento"])
 async def registrar_departamento(codigoDepartamento:str,nombreDepartamento:str):
+    id_auto = False
     return t_departamento.post(
         protocolos,
+        id_auto,
         codigoDepartamento,
         nombreDepartamento.upper(),
         )
@@ -317,8 +329,10 @@ async def consultar_id_estado(codigoEstado:str):
     return t_estado.get(protocolos,codigoEstado)
 @app.post("/insert/estado", tags=["Estado"])
 async def registrar_estado(codigoEstado:str,nombreEstado:str):
+    id_auto = False
     return t_estado.post(
         protocolos,
+        id_auto,
         codigoEstado,
         nombreEstado.title(),
         )
@@ -344,8 +358,10 @@ async def consultar_id_imagen(refImagen:str):
     return t_imagen.get(protocolos,refImagen)
 @app.post("/insert/imagen", tags=["Imagen"])
 async def registrar_imagen(refImagen:str,fk_codigoCita:str):
+    id_auto = False
     return t_imagen.post(
         protocolos,
+        id_auto,
         refImagen,
         fk_codigoCita,
         )
@@ -374,8 +390,10 @@ async def consultar_id_usuario(codigoUsuario:str):
     return t_usuario.get(protocolos,codigoUsuario)
 @app.post("/insert/usuario", tags=["Usuario"])
 async def registrar_usuario(codigoUsuario:str,acceso:str,contraseña:str):
+    id_auto = False
     return t_usuario.post(
         protocolos,
+        id_auto,
         codigoUsuario,
         acceso,
         contraseña,
@@ -403,8 +421,10 @@ async def consultar_id_rol(codigoRol:str):
     return t_rol.get(protocolos,codigoRol)
 @app.post("/insert/rol", tags=["Rol"])
 async def registrar_rol(codigoRol:str,descripcionRol:str):
+    id_auto = False
     return t_rol.post(
         protocolos,
+        id_auto,
         codigoRol,
         descripcionRol,
         )
@@ -431,8 +451,10 @@ async def consultar_id_permiso(codigoPermiso:str):
     return t_permiso.get(protocolos,codigoPermiso)
 @app.post("/insert/permiso", tags=["Permiso"])
 async def registrar_permiso(codigoPermiso:str,descripcionPermiso:str,estadoPermiso:str):
+    id_auto = False
     return t_permiso.post(
         protocolos,
+        id_auto,
         codigoPermiso,
         descripcionPermiso,
         estadoPermiso,

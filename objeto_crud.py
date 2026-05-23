@@ -66,14 +66,15 @@ class SistemaCRUD:
             return rows
         except mariadb.Error as e:
             raise HTTPException(status_code=500, detail=f"Error: {e}")
-    def post(self, protocolos:dict, *valores):
+    def post(self, protocolos:dict, id_auto:bool, *valores):
         HTTPException = protocolos['HTTPException']
         cursor_obj = protocolos['cursor_obj']
         mariadb = protocolos['mariadb']
         cc = protocolos['cc']
 
         columnas = []
-        columnas.append(list(self.id.keys())[0])
+        if not id_auto:
+            columnas.append(list(self.id.keys())[0])
         columnas.extend(list(self.atributos.keys()))
 
         sql = com_sql.insertar_datos(self.tabla,columnas)
