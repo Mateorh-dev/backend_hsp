@@ -1,3 +1,0 @@
-mariadb-server 
-mariadb-client
-libmariadb-dev

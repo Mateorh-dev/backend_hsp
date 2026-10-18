@@ -2,33 +2,22 @@ from tipo_dato_sql import *
 from diccionario_a_sql import DiccionarioSQL
 
 tablas = {
-    "departamento":{
-        "codigoDepartamento":[Char(2), "PK"],
-        "nombreDepartamento":[Varchar(25), "NN"],
-    },
-    "municipio":{
-        "codigoMunicipio":[Char(5), "PK"],
-        "nombreMunicipio":[Varchar(25), "NN"],
-        "departamento.codigoDepartamento":["FK"],
-    },
     "paciente":{
         "numeroIdentificacion": [Varchar(15), "PK"],
         "primerNombre":[Varchar(25), "NN"],
         "segundoNombre":[Varchar(25)],
         "primerApellido":[Varchar(25), "NN"],
         "segundoApellido":[Varchar(25)],
-        "fechaNacimiento":[Date()],
-        "peso":[Varchar(10)],
+        "fechaNacimiento":[Date(), "NN"],
         "telefono":[Varchar(15), "NN"],
         "correoElectronico":[Varchar(128)],
         "direccion":[Text()],
         "profesion":[Text()],
-        "antecedentes":[Text()],
-        "alergias":[Text()],
-        "municipio.codigoMunicipio":["FK"],
+        "estadoActivo":[Bool(),"NN"],
     },
     "tratamiento":{
         "codigoTratamiento":[Int(), "PK", "AUTO"],
+        "codigoHash":[Char(7), "NN"],
         "nombreTratamiento":[Text(), "NN"],
         "descripcionTratamiento":[Text()],
         "paciente.numeroIdentificacion":["FK"],
@@ -40,20 +29,20 @@ tablas = {
     },
     "cita":{
         "codigoCita":[Int(), "PK", "AUTO"],
+        "codigoHash":[Char(5), "NN"],
         "fecha":[Date(), "NN"],
         "hora":[Time(), "NN"],
-        "patologia":[Text()],
-        "tratamientoRecomendado":[Text()],
         "precio":[Int()],
         "observacion":[Text()],
-        "estado.codigoEstado":["FK"],
+        "estadocita.codigoEstado":["FK"],
     },
-    "estado":{
+    "estadocita":{
         "codigoEstado":[Char(3), "PK"],
         "nombreEstado":[Varchar(32), "NN"],
     },
     "imagen":{
-        "refImagen":[Varchar(32), "PK"],
+        "codigoImagen":[Int(), "PK", "AUTO"],
+        "refImagen":[Varchar(32), "NN"],
         "cita.codigoCita":["FK"],
     },
 }

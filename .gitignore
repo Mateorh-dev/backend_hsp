@@ -3,3 +3,5 @@ datos_perfil*
 example*
 test*
 (test)
+venv
+.env
