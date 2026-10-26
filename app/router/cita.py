@@ -106,7 +106,7 @@ def consulta_by_tratamiento_hash_cita(data: str):
 
 
 @router.post("/insert/cita")
-def registrar_cita(data: DataCitaCreate = Depends()):
+def registrar_cita(data: DataCitaCreate):
     session  = db.SessionLocal()
     try:
         register = Cita(
@@ -130,7 +130,7 @@ def registrar_cita(data: DataCitaCreate = Depends()):
     
 
 @router.patch("/update/cita")
-def actualizar_cita(identification: DataCitaId = Depends(), data: DataCitaUpdate = Depends()):
+def actualizar_cita(data: DataCitaUpdate, identification: DataCitaId = Depends()):
     session  = db.SessionLocal()
     try:
         request = (

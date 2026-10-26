@@ -43,7 +43,7 @@ def consultar_like_citaportratamiento():
     
 """
 @router.post("/insert/citaportratamiento")
-def registrar_citaportratamiento(data: DataCitaPorTratamientoCreate = Depends()):
+def registrar_citaportratamiento(data: DataCitaPorTratamientoCreate):
     session  = db.SessionLocal()
     try:
         register = CitaPorTratamiento(
@@ -61,7 +61,7 @@ def registrar_citaportratamiento(data: DataCitaPorTratamientoCreate = Depends())
     finally:
         session.close()
 @router.post("/insert/hash/citaportratamiento")
-def registrar_por_hash_citaportratamiento(data: DataCitaPorTratamientoHashCreate = Depends()):
+def registrar_por_hash_citaportratamiento(data: DataCitaPorTratamientoHashCreate):
     session  = db.SessionLocal()
     try:
         request_cita = (
@@ -92,7 +92,7 @@ def registrar_por_hash_citaportratamiento(data: DataCitaPorTratamientoHashCreate
 
 
 @router.patch("/update/citaportratamiento")
-def actualizar_citaportratamiento(identification: DataCitaPorTratamientoId = Depends(), data: DataCitaPorTratamientoUpdate = Depends()):
+def actualizar_citaportratamiento(data: DataCitaPorTratamientoUpdate, identification: DataCitaPorTratamientoId = Depends()):
     session  = db.SessionLocal()
     try:
         request = (

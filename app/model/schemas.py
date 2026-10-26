@@ -1,7 +1,7 @@
 # modelo de datos ingresados con pydantic
 from datetime import date, time
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 # Paciente
 class DataPacienteCreate(BaseModel):
@@ -15,6 +15,13 @@ class DataPacienteCreate(BaseModel):
     correoElectronico: Optional[str] = None
     direccion: Optional[str] = None
     profesion: Optional[str] = None
+    
+    @field_validator('primerNombre', 'segundoNombre', 'primerApellido', 'segundoApellido', mode='before')
+    @classmethod
+    def mayusculas(cls, nombre: Optional[str]) -> Optional[str]:
+        if nombre is not None:
+            return nombre.upper()
+        return nombre
 
 class DataPacienteUpdate(BaseModel):
     primerNombre: Optional[str] = None
@@ -26,6 +33,13 @@ class DataPacienteUpdate(BaseModel):
     correoElectronico: Optional[str] = None
     direccion: Optional[str] = None
     profesion: Optional[str] = None
+
+    @field_validator('primerNombre', 'segundoNombre', 'primerApellido', 'segundoApellido', mode='before')
+    @classmethod
+    def mayusculas(cls, nombre: Optional[str]) -> Optional[str]:
+        if nombre is not None:
+            return nombre.upper()
+        return nombre
 
 class DataPacienteId(BaseModel):
     numeroIdentificacion: str

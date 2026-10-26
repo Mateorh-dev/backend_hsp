@@ -56,7 +56,7 @@ def consulta_dinamica_tratamiento(data: str):
     
 
 @router.post("/insert/tratamiento")
-def registrar_tratamiento(data: DataTratamientoCreate = Depends()):
+def registrar_tratamiento(data: DataTratamientoCreate):
     session  = db.SessionLocal()
     try:
         register = Tratamiento(
@@ -78,7 +78,7 @@ def registrar_tratamiento(data: DataTratamientoCreate = Depends()):
     
 
 @router.patch("/update/tratamiento")
-def actualizar_tratamiento(identification: DataTratamientoId = Depends(), data: DataTratamientoUpdate = Depends()):
+def actualizar_tratamiento(data: DataTratamientoUpdate, identification: DataTratamientoId = Depends()):
     session  = db.SessionLocal()
     try:
         request = (
