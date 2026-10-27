@@ -2,8 +2,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy import select, or_
 from sqlalchemy.exc import SQLAlchemyError
 from ..core.database import Database
-from ..model.models import Tratamiento
-from ..model.schemas import DataTratamientoCreate, DataTratamientoUpdate, DataTratamientoId
+from ..model.models import Tratamiento, Paciente
+from ..model.schemas import DataTratamientoCreate, DataTratamientoUpdate, DataTratamientoId, DataPacienteId
 from ..model.hash import generar_hash
 
 db = Database()
@@ -46,6 +46,28 @@ def consulta_dinamica_tratamiento(data: str):
         if not tratamiento:
             raise HTTPException (status_code=400)
         return tratamiento
+    except SQLAlchemyError as e:
+        raise HTTPException (
+            status_code= 500,
+            detail= f"Error: {e}"
+        )
+    finally:
+        session.close()
+
+
+@router.get("/select/by_paciente/tratamiento")
+def consulta_by_tratamiento_cita(data: DataPacienteId = Depends()):
+    session  = db.SessionLocal()
+    try:
+        request = (
+            select(Tratamiento)
+            .join(Paciente, Tratamiento.fk_numeroIdentificacion == Paciente.numeroIdentificacion)
+            .where(Tratamiento.fk_numeroIdentificacion == data.numeroIdentificacion)
+        )
+        citas = session.execute(request).scalars().all()
+        if not citas:
+            raise HTTPException (status_code=400)
+        return citas
     except SQLAlchemyError as e:
         raise HTTPException (
             status_code= 500,

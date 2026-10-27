@@ -54,7 +54,6 @@ class DataTratamientoCreate(BaseModel):
 class DataTratamientoUpdate(BaseModel):
     nombreTratamiento: Optional[str] = None
     descripcionTratamiento: Optional[str] = None
-    fk_numeroIdentificacion: Optional[str] = None
 
 class DataTratamientoId(BaseModel):
     codigoTratamiento: int
