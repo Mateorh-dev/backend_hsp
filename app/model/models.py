@@ -1,6 +1,6 @@
 # modelado de las tablas con sqlalchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import String,CHAR, Date, ForeignKey, Integer, Text, Time, Boolean
+from sqlalchemy import String, CHAR, Date, ForeignKey, Integer, Text, Time, Boolean, Index
 from datetime import date, time
 from typing import Optional
 
@@ -37,6 +37,11 @@ class CitaPorTratamiento(Base):
     codigoCitaPorTratamiento: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     fk_codigoTratamiento: Mapped[int] = mapped_column(Integer, ForeignKey("tratamiento.codigoTratamiento"))
     fk_codigoCita: Mapped[int] = mapped_column(Integer, ForeignKey("cita.codigoCita"))
+
+    __table_args__ = (
+        Index("idx_cpt_cita", "fk_codigoCita"),
+        Index("idx_cpt_tratamiento", "fk_codigoTratamiento"),
+    )
 
 class Cita(Base):
     __tablename__ = "cita"
