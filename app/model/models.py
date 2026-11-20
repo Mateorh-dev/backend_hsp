@@ -39,8 +39,7 @@ class CitaPorTratamiento(Base):
     fk_codigoCita: Mapped[int] = mapped_column(Integer, ForeignKey("cita.codigoCita"))
 
     __table_args__ = (
-        Index("idx_cpt_cita", "fk_codigoCita"),
-        Index("idx_cpt_tratamiento", "fk_codigoTratamiento"),
+        Index("idx_tratamiento_cita", "fk_codigoTratamiento", "fk_codigoCita"),
     )
 
 class Cita(Base):
