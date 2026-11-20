@@ -166,6 +166,7 @@ def actualizar_paciente(data: DataPacienteUpdate, identification: DataPacienteId
                 Paciente.numeroIdentificacion == identification.numeroIdentificacion,
                 Paciente.estadoActivo == True
             )
+            .with_for_update()
         )
         paciente = session.execute(request).scalar_one_or_none()
         if paciente is None:

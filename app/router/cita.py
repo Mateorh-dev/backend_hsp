@@ -136,6 +136,7 @@ def actualizar_cita(data: DataCitaUpdate, identification: DataCitaId = Depends()
         request = (
             select(Cita)
             .where(Cita.codigoCita == identification.codigoCita)
+            .with_for_update()
         )
         cita = session.execute(request).scalar_one()
         changes = data.model_dump(exclude_unset=True, exclude_none=True)

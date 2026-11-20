@@ -106,6 +106,7 @@ def actualizar_tratamiento(data: DataTratamientoUpdate, identification: DataTrat
         request = (
             select(Tratamiento)
             .where(Tratamiento.codigoTratamiento == identification.codigoTratamiento)
+            .with_for_update()
         )
         tratamiento = session.execute(request).scalar_one()
         changes = data.model_dump(exclude_unset=True, exclude_none=True)
